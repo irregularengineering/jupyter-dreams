@@ -1,0 +1,36 @@
+div#maintoolbar {
+    display: none !important;
+}
+
+#notification_trusted {
+    visibility: hidden
+}
+
+#modal_indicator {
+    visibility: hidden
+}
+
+#kernel_indicator {
+    visibility: hidden
+}
+
+#kernel_indicator .kernel_indicator_name {
+    visibility: visible;
+}
+
+.checkpoint_status {
+    visibility: hidden
+}
+
+.login_widget {
+    visibility: hidden
+}
+
+.kernel_logo_widget {
+    visibility: hidden
+}
+
+
+.autosave_status {
+    visibility: hidden
+}

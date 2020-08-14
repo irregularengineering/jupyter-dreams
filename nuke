@@ -1,0 +1,24 @@
+#! /bin/bash
+#
+# Destroy all Docker things associated with pewpyter
+#
+# Usage:
+#   ./nuke
+
+# Stop container if currently running
+if [ $(docker ps -q --filter "name=pewpyter") ]; then
+    echo "Stopping pewpyter"
+    echo "Stopped $(docker stop pewpyter)"
+fi
+
+# Remove container if exists
+if [ $(docker ps -qq --filter "name=pewpyter") ]; then
+    echo "Removing pewpyter"
+    echo "Removing $(docker stop pewpyter)"
+fi
+
+# Remove images if they exist
+if [ $(docker images -q irregularengineering/pewpyter) ]; then
+    echo "Removing images"
+    echo "Removing $(docker images -q irregularengineering/pewpyter)"
+fi

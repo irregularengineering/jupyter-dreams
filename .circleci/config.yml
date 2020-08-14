@@ -1,0 +1,51 @@
+version: 2
+
+jobs:
+  build:
+    machine: true
+    steps:
+      - checkout
+      - run: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run: docker build . --tag irregularengineering/pewpyter:$CIRCLE_SHA1
+      - run: docker push irregularengineering/pewpyter:$CIRCLE_SHA1
+
+  lint:
+    machine: true
+    steps:
+      - run: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run: docker pull irregularengineering/pewpyter:$CIRCLE_SHA1
+      - run: docker run irregularengineering/pewpyter:$CIRCLE_SHA1 pylint pewpyter tests
+
+  test:
+    machine: true
+    steps:
+      - checkout
+      - run: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run: docker pull irregularengineering/pewpyter:$CIRCLE_SHA1
+      - run: docker run irregularengineering/pewpyter:$CIRCLE_SHA1 pytest -vv tests
+
+  ship:
+    machine: true
+    steps:
+      - run: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run: docker pull irregularengineering/pewpyter:$CIRCLE_SHA1
+      - run: docker tag irregularengineering/pewpyter:$CIRCLE_SHA1 irregularengineering/pewpyter:latest
+      - run: docker push irregularengineering/pewpyter:latest
+
+workflows:
+  version: 2
+  pewpyter_ci:
+    jobs:
+      - build
+      - lint:
+          requires:
+            - build
+      - test:
+          requires:
+            - build
+      - ship:
+          filters:
+            branches:
+              only: master
+          requires:
+            - build

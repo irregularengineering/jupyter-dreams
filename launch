@@ -1,0 +1,43 @@
+#! /bin/bash
+#
+# Pull image from Docker Cloud, start it, and attach to bash session
+#
+# Usage:
+#   ./launch
+#   ./launch lab
+
+# Stop container if currently running
+if [ $(docker ps -q --filter "name=pewpyter") ]; then
+    echo "Stopping pewpyter"
+    echo "Stopped $(docker stop pewpyter)"
+fi
+
+# Delete container if exists
+if [ $(docker ps -aq --filter "name=pewpyter") ]; then
+    echo "Removing pewpyter"
+    echo "Removed $(docker rm pewpyter)"
+fi
+
+# Pull latest image from Docker Cloud
+docker pull irregularengineering/pewpyter:latest
+
+# Start Jupyter inside new container
+BLUPYTER="notebook"
+if [ "$1" == "lab" ]; then
+    BLUPYTER="lab"
+fi
+docker run -d --name pewpyter -v "$(pwd):/opt/pewpyter" -p "8888:8888" irregularengineering/pewpyter:latest \
+    jupyter $BLUPYTER --ip=0.0.0.0 --allow-root --no-browser
+
+# Wait for Jupyter to start, then grab token
+TOKEN=""
+while [ -z "$TOKEN" ]; do
+    TOKEN="$(docker logs pewpyter 2>&1 | grep -m 1 "?token=" | cut -d'=' -f2)"
+    sleep 1
+done
+
+# Open the notebook in chrome
+open "http://0.0.0.0:8888?token=$TOKEN"
+
+# Attach to bash session
+docker exec -ti pewpyter bash

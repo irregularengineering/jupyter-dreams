@@ -1,0 +1,12 @@
+#! /bin/bash
+#
+# Build Docker image and ship to Docker Cloud
+#
+# Usage:
+#   ./deploy
+
+# Build Docker image
+docker build . --force-rm --no-cache --tag irregularengineering/pewpyter:latest
+
+# Ship image to Docker Cloud
+docker push irregularengineering/pewpyter:latest
